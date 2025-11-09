@@ -843,29 +843,48 @@
 
             // Скрываем все кнопки перед экспортом
             const buttons = element.querySelectorAll('button');
-            buttons.forEach(btn => btn.style.display = 'none');
+            const controls = element.querySelectorAll('.category-controls, .item-controls');
 
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: 'inventory-checklist.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Показываем кнопки обратно после экспорта
-                buttons.forEach(btn => btn.style.display = '');
+            buttons.forEach(btn => {
+                btn.style.display = 'none';
+                btn.style.visibility = 'hidden';
             });
+            controls.forEach(ctrl => {
+                ctrl.style.display = 'none';
+                ctrl.style.visibility = 'hidden';
+            });
+
+            // Даем время на обновление DOM
+            setTimeout(() => {
+                const opt = {
+                    margin: [15, 15, 15, 15],
+                    filename: 'inventory-checklist.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait'
+                    },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // Показываем кнопки обратно после экспорта
+                    buttons.forEach(btn => {
+                        btn.style.display = '';
+                        btn.style.visibility = '';
+                    });
+                    controls.forEach(ctrl => {
+                        ctrl.style.display = '';
+                        ctrl.style.visibility = '';
+                    });
+                });
+            }, 100);
         }
 
         function saveToLocalStorage() {
