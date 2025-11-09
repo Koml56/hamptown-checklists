@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keittiön Preppaus Lista - Viikko</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1.5cm 1cm 1cm 1cm;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+            line-height: 1.3;
+            color: #000000;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .no-print {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .no-print h3 {
+            color: #003366;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #003366;
+            font-size: 16pt;
+            text-transform: uppercase;
+            margin: 0 0 8px 0;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #666666;
+            margin: 3px 0;
+            font-size: 9pt;
+        }
+
+        .company-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .company-info div {
+            font-size: 9pt;
+        }
+
+        .company-info strong {
+            color: #003366;
+        }
+
+        h2 {
+            color: #0066cc;
+            font-size: 12pt;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 4px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .category-section {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .category-controls {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: none;
+        }
+
+        .category-section:hover .category-controls {
+            display: block;
+        }
+
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 5px 0;
+            font-size: 9pt;
+        }
+
+        .checklist-table tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .checklist-table th {
+            background-color: #003366;
+            color: white;
+            padding: 8px 5px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #003366;
+            font-size: 9pt;
+        }
+
+        .checklist-table th.category-title {
+            background-color: #004080;
+            font-size: 11pt;
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        .checklist-table td {
+            padding: 6px 5px;
+            border: 1px solid #cccccc;
+        }
+
+        .checklist-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .checklist-table tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        .item-col {
+            width: 180px;
+            font-weight: 500;
+        }
+
+        .day-col {
+            width: 50px;
+            text-align: center;
+        }
+
+        .item-row {
+            position: relative;
+        }
+
+        .item-row:hover .item-controls {
+            display: block;
+        }
+
+        .item-controls {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        .btn-small {
+            padding: 2px 6px;
+            font-size: 11px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-small:hover {
+            background-color: #c82333;
+        }
+
+        .success {
+            background-color: #d1edff;
+            border-left: 4px solid #17a2b8;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 9pt;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #f39c12;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 9pt;
+        }
+
+        .signature-section {
+            margin-top: 20px;
+            page-break-inside: avoid;
+        }
+
+        .signature-section h2 {
+            color: #003366;
+        }
+
+        .signature-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .signature-section td {
+            padding: 8px;
+            border-bottom: 1px solid #cccccc;
+            font-size: 9pt;
+        }
+
+        .signature-section td:nth-child(odd) {
+            font-weight: bold;
+            width: 100px;
+            color: #003366;
+        }
+
+        .editable {
+            background-color: transparent;
+            border: 1px dashed transparent;
+            padding: 2px;
+            cursor: text;
+        }
+
+        .editable:hover,
+        .editable:focus {
+            border: 1px dashed #0066cc;
+            background-color: #fff;
+            outline: none;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 10px;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .category-controls,
+            .item-controls {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <h3>🛠️ Панель Управления</h3>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Главная</button>
+            <button class="btn btn-success" onclick="addCategory()">+ Добавить Категорию</button>
+            <button class="btn btn-primary" onclick="exportToPDF()">📄 Экспорт в PDF</button>
+            <button class="btn btn-secondary" onclick="saveToLocalStorage()">💾 Сохранить</button>
+            <button class="btn btn-secondary" onclick="loadFromLocalStorage()">📂 Загрузить</button>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="header">
+            <h1>KEITTIÖN PREPPAUS LISTA - VIIKKO</h1>
+            <p>Hamptown Burger - Viikottainen Tarkistuslista</p>
+        </div>
+
+        <div class="company-info">
+            <div><strong>Yritys:</strong> Linnan Burger Oy</div>
+            <div><strong>Viikko:</strong> _____________</div>
+            <div><strong>Keittiön päällikkö:</strong> _____________</div>
+        </div>
+
+        <div class="success">
+            <strong>Ohje:</strong> Merkitse jokaiselle päivälle:<br>
+            <strong>X</strong> = Tehty (Done)<br>
+            <strong>\</strong> = Pitää tehdä (Need to be done)<br>
+            <strong>\!</strong> = Kiireellinen, pitää tehdä heti (Need to be done URGENT)
+        </div>
+
+        <h2>PÄIVITTÄISET PREPPAUSKOHTEET</h2>
+
+        <div id="categories-container">
+            <!-- PIKKELÖIDYT / MARINOITUT -->
+            <div class="category-section" data-category="Pikkelöidyt/Marinoitut">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">PIKKELÖIDYT / MARINOITUT</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Pkl Sipuli</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Pkl Kurkku</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Pkl Tomaatti</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Mari Sipuli</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">KK Burger Pkl</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- MAJONEESIT -->
+            <div class="category-section" data-category="Majoneesit">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">MAJONEESIT</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Kevätsipuli Majoneesi</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Tryffeli-Valkosipuli Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Manse Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Chili Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Bad Santa Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Vege Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Parmesan Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Sinihome Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">KK Burger Majo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- HILLOT JA KASTIKKEET -->
+            <div class="category-section" data-category="Hillot ja Kastikkeet">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">HILLOT JA KASTIKKEET</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Paholaishillo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Pekoni Hillo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Omena Hillo</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">BBQ Sinappi</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Mushroom Steak Sauce</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Chimichurri Sauce</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Salad Dressing</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">BBQ Bottles</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- PIHVIT JA LIHA -->
+            <div class="category-section" data-category="Pihvit ja Liha">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">PIHVIT JA LIHA</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Kanapihvin Preppaus</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Smash Pihvi</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Normi Pihvi</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Wagyu Pihvi</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Vacuum Seal Steaks</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- TUOREET RAAKA-AINEET -->
+            <div class="category-section" data-category="Tuoreet Raaka-aineet">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">TUOREET RAAKA-AINEET</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Tuore Tomaatti</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Tuore Kevätsipuli</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Tuore Sipuli</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- MUUT PREPPAUKSET -->
+            <div class="category-section" data-category="Muut Preppaukset">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">MUUT PREPPAUKSET</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Smash Peruna</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Caramelized Onion</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Guacamole</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+
+            <!-- ERIKOISET / SPECIAL -->
+            <div class="category-section" data-category="Erikoiset">
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">ERIKOISET / SPECIAL</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Tiramisu</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Change Oil</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">VIP Bags</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Parmesan Grated</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Manchego Slices</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>Tärkeää:</strong> Varmista FIFO-periaate kaikissa raaka-aineissa. Tarkista päivämäärät ja lämpötilat päivittäin.
+        </div>
+
+        <div class="signature-section">
+            <h2>VIIKON ALLEKIRJOITUKSET</h2>
+            <table style="border-collapse: collapse; width: 100%;">
+                <tr>
+                    <td><strong>Maanantai:</strong></td>
+                    <td>_____________</td>
+                    <td><strong>Torstai:</strong></td>
+                    <td>_____________</td>
+                    <td><strong>Sunnuntai:</strong></td>
+                    <td>_____________</td>
+                </tr>
+                <tr>
+                    <td><strong>Tiistai:</strong></td>
+                    <td>_____________</td>
+                    <td><strong>Perjantai:</strong></td>
+                    <td>_____________</td>
+                    <td><strong>Esimies:</strong></td>
+                    <td>_____________</td>
+                </tr>
+                <tr>
+                    <td><strong>Keskiviikko:</strong></td>
+                    <td>_____________</td>
+                    <td><strong>Lauantai:</strong></td>
+                    <td>_____________</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function addCategory() {
+            const categoryName = prompt('Введите название категории:');
+            if (!categoryName) return;
+
+            const container = document.getElementById('categories-container');
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category-section';
+            categoryDiv.setAttribute('data-category', categoryName);
+
+            categoryDiv.innerHTML = `
+                <div class="category-controls no-print">
+                    <button class="btn-small" onclick="removeCategory(this)">✕</button>
+                </div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="item-col category-title" contenteditable="true">${categoryName.toUpperCase()}</th>
+                            <th class="day-col">Maanantai</th>
+                            <th class="day-col">Tiistai</th>
+                            <th class="day-col">Keskiviikko</th>
+                            <th class="day-col">Torstai</th>
+                            <th class="day-col">Perjantai</th>
+                            <th class="day-col">Lauantai</th>
+                            <th class="day-col">Sunnuntai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td class="editable" contenteditable="true">Новая позиция</td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                            <div class="item-controls no-print">
+                                <button class="btn-small" onclick="removeItem(this)">✕</button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+            `;
+
+            container.appendChild(categoryDiv);
+        }
+
+        function removeCategory(button) {
+            if (confirm('Удалить эту категорию?')) {
+                button.closest('.category-section').remove();
+            }
+        }
+
+        function addItem(button) {
+            const tbody = button.closest('.category-section').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'item-row';
+            newRow.innerHTML = `
+                <td class="editable" contenteditable="true">Новая позиция</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                <div class="item-controls no-print">
+                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                </div>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function removeItem(button) {
+            button.closest('.item-row').remove();
+        }
+
+        function exportToPDF() {
+            const element = document.getElementById('content');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'prep-checklist.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'landscape'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function saveToLocalStorage() {
+            const content = document.getElementById('content').innerHTML;
+            localStorage.setItem('prep-checklist', content);
+            alert('✅ Данные сохранены!');
+        }
+
+        function loadFromLocalStorage() {
+            const content = localStorage.getItem('prep-checklist');
+            if (content) {
+                document.getElementById('content').innerHTML = content;
+                alert('✅ Данные загружены!');
+            } else {
+                alert('⚠️ Нет сохраненных данных');
+            }
+        }
+    </script>
+</body>
+</html>

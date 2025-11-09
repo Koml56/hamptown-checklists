@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamptown Burger - Varastotarkistuslista</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 8.5pt;
+            line-height: 1.2;
+            color: #000000;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .no-print {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .no-print h3 {
+            color: #003366;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            color: #003366;
+            font-size: 14pt;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            color: #666666;
+            font-size: 8pt;
+            margin: 2px 0;
+        }
+
+        .company-info {
+            background-color: #f8f9fa;
+            padding: 8px 10px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 12px;
+            border-radius: 3px;
+        }
+
+        .company-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .company-info td {
+            padding: 2px 4px;
+            font-size: 8pt;
+        }
+
+        .company-info td:first-child {
+            font-weight: bold;
+            width: 120px;
+            color: #003366;
+        }
+
+        h2 {
+            color: #0066cc;
+            font-size: 10.5pt;
+            border-bottom: 1.5px solid #0066cc;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .info-box {
+            background: #d1edff;
+            border-left: 3px solid #17a2b8;
+            padding: 6px 8px;
+            margin: 8px 0;
+            font-size: 7.5pt;
+            line-height: 1.3;
+        }
+
+        .info-box strong {
+            color: #004080;
+        }
+
+        .table-section {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .section-wrapper {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .category-controls {
+            position: absolute;
+            top: -5px;
+            right: 0;
+            display: none;
+        }
+
+        .table-section:hover .category-controls {
+            display: block;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            font-size: 8pt;
+        }
+
+        .inventory-table thead {
+            background-color: #003366;
+            color: white;
+        }
+
+        .inventory-table th {
+            padding: 4px 3px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #cccccc;
+            font-size: 7.5pt;
+        }
+
+        .inventory-table td {
+            padding: 3px;
+            border: 1px solid #cccccc;
+            line-height: 1.1;
+            vertical-align: middle;
+        }
+
+        .inventory-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .col-item {
+            width: 35%;
+        }
+
+        .col-status {
+            width: 12%;
+            text-align: center;
+        }
+
+        .col-order {
+            width: 12%;
+            text-align: center;
+        }
+
+        .col-notes {
+            width: 41%;
+        }
+
+        .item-row {
+            position: relative;
+        }
+
+        .item-row:hover .item-controls {
+            display: block;
+        }
+
+        .item-controls {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        .btn-small {
+            padding: 2px 6px;
+            font-size: 11px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-small:hover {
+            background-color: #c82333;
+        }
+
+        .signature-section {
+            margin-top: 20px;
+            border-top: 2px solid #003366;
+            padding-top: 10px;
+            page-break-inside: avoid !important;
+        }
+
+        .signature-section h2 {
+            color: #003366;
+            border: none;
+            margin-top: 0;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .signature-table td {
+            padding: 6px;
+            border-bottom: 1px solid #000;
+            font-size: 8pt;
+        }
+
+        .signature-table td:nth-child(odd) {
+            font-weight: bold;
+            width: 100px;
+        }
+
+        .category-note {
+            font-size: 7pt;
+            color: #666666;
+            font-style: italic;
+            margin-top: -2px;
+            margin-bottom: 4px;
+        }
+
+        .editable {
+            background-color: transparent;
+            border: 1px dashed transparent;
+            padding: 2px;
+            cursor: text;
+        }
+
+        .editable:hover,
+        .editable:focus {
+            border: 1px dashed #0066cc;
+            background-color: #fff;
+            outline: none;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .table-section {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-region-break-inside: avoid !important;
+            }
+
+            .section-wrapper {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-region-break-inside: avoid !important;
+            }
+
+            .inventory-table tbody tr:hover {
+                background-color: transparent;
+            }
+
+            h2 {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            .category-note {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            h2 + .category-note {
+                page-break-after: avoid !important;
+            }
+
+            h2 + .category-note + .table-section {
+                page-break-before: avoid !important;
+            }
+
+            h2 + .table-section {
+                page-break-before: avoid !important;
+            }
+
+            .company-info, .info-box {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .signature-section {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            h2 {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .category-controls,
+            .item-controls {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <h3>🛠️ Панель Управления</h3>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Главная</button>
+            <button class="btn btn-success" onclick="addCategory()">+ Добавить Категорию</button>
+            <button class="btn btn-primary" onclick="exportToPDF()">📄 Экспорт в PDF</button>
+            <button class="btn btn-secondary" onclick="saveToLocalStorage()">💾 Сохранить</button>
+            <button class="btn btn-secondary" onclick="loadFromLocalStorage()">📂 Загрузить</button>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="header">
+            <h1>VARASTOTARKISTUSLISTA</h1>
+            <p>Hamptown Burger - Tilausvalvonta ja varastonhallinta</p>
+        </div>
+
+        <div class="company-info">
+            <table>
+                <tr>
+                    <td>Yritys:</td>
+                    <td>Linnan Burger Oy</td>
+                </tr>
+                <tr>
+                    <td>Tarkistuspäivä:</td>
+                    <td>_____________</td>
+                </tr>
+                <tr>
+                    <td>Tarkastaja:</td>
+                    <td>_____________</td>
+                </tr>
+                <tr>
+                    <td>Seuraava tilaus:</td>
+                    <td>_____________</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="info-box">
+            <strong>TÄYTTÖOHJEET:</strong> <strong>Varastotilanne:</strong> "X" = riittävästi | "0" = ei varastossa | Numero = jäljellä • <strong>Tilattava määrä:</strong> tarvittava määrä tai tyhjä • <strong>Huomiot:</strong> päivämäärät, erityishuomiot
+        </div>
+
+        <div id="categories-container">
+            <!-- 1. PROTEIINIT -->
+            <div class="section-wrapper">
+                <h2 contenteditable="true">1. PROTEIINIT</h2>
+                <p class="category-note" contenteditable="true">Lihatuotteet, kana ja kasvisproteiinit</p>
+
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Naudanjauheliha (kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Kariniemen Kananreisifilee (ca. 2kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">HK American Pekoni (ca. 2,3kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Beyond Burger Pihvit (40x113g)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Ole's Vegaanipihvit (28x120g)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Wagyu-liha</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Entrecote</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            </div>
+
+            <!-- 2. SÄMPYLÄT JA LEIVÄT -->
+            <div class="section-wrapper">
+                <h2 contenteditable="true">2. SÄMPYLÄT JA LEIVÄT</h2>
+                <p class="category-note" contenteditable="true">Martin's, Vaasan ja gluteenittomat vaihtoehdot</p>
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Martin's Potato Rolls 3.5" (9x8kpl)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Vaasan Perunasämpylä 9.5cm, 70g</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Rollfoods Gluteeniton Sämpylä (20x90g)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            </div>
+
+            <!-- 3. VIHANNEKSET -->
+            <div class="section-wrapper">
+                <h2 contenteditable="true">3. VIHANNEKSET JA TUOREET TUOTTEET</h2>
+                <p class="category-note" contenteditable="true">Tarkista vanhentumispäivät ja tuoreus</p>
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot (päivämäärät!)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Viinirypäletomaatti 1kg</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Kurkku 1kg (Suomi)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Menu Jäävuorisalaatti 100g</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Punasipuli 1kg</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Kevätsipuli</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Avokado</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            </div>
+
+            <!-- 4. JUUSTOT -->
+            <div class="section-wrapper">
+                <h2 contenteditable="true">4. JUUSTOT</h2>
+                <p class="category-note" contenteditable="true">Castello, Gouda ja vegaanivaihtoehdot</p>
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Castello Burger Blue 150g viipale</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Herkkutilan Gouda 400g viipale</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Parmesaanijuusto</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            </div>
+
+            <!-- 5. KASTIKKEET -->
+            <div class="section-wrapper">
+                <h2 contenteditable="true">5. KASTIKKEET JA MAUSTEET</h2>
+                <p class="category-note" contenteditable="true">Majoneesit, erikoiskastikkeet ja premium-ainekset</p>
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Menu Majoneesi 78% (5kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Meira's Sinappi (10kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Heinz Ketsuppi (1kg)</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="signature-section">
+            <h2>ALLEKIRJOITUKSET</h2>
+            <table class="signature-table">
+                <tr>
+                    <td>Tarkistuksen suorittaja:</td>
+                    <td>_________________________________________</td>
+                </tr>
+                <tr>
+                    <td>Päivämäärä:</td>
+                    <td>_________________________________________</td>
+                </tr>
+                <tr>
+                    <td>Tilauksen hyväksyjä:</td>
+                    <td>_________________________________________</td>
+                </tr>
+                <tr>
+                    <td>Päivämäärä:</td>
+                    <td>_________________________________________</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function addCategory() {
+            const categoryName = prompt('Введите название категории:');
+            if (!categoryName) return;
+
+            const container = document.getElementById('categories-container');
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'section-wrapper';
+
+            sectionDiv.innerHTML = `
+                <h2 contenteditable="true">${categoryName.toUpperCase()}</h2>
+                <p class="category-note" contenteditable="true">Описание категории</p>
+                <div class="table-section">
+                    <div class="category-controls no-print">
+                        <button class="btn-small" onclick="removeSection(this)">✕</button>
+                    </div>
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th class="col-item">Tuote</th>
+                                <th class="col-status">Varasto</th>
+                                <th class="col-order">Tilattava</th>
+                                <th class="col-notes">Huomiot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-row">
+                                <td class="editable" contenteditable="true">Новый товар</td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <td class="editable" contenteditable="true"></td>
+                                <div class="item-controls no-print">
+                                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success btn-small no-print" onclick="addItem(this)" style="margin-bottom: 10px;">+ Добавить Позицию</button>
+                </div>
+            `;
+
+            container.appendChild(sectionDiv);
+        }
+
+        function removeSection(button) {
+            if (confirm('Удалить эту категорию?')) {
+                button.closest('.section-wrapper').remove();
+            }
+        }
+
+        function addItem(button) {
+            const tbody = button.closest('.table-section').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'item-row';
+            newRow.innerHTML = `
+                <td class="editable" contenteditable="true">Новый товар</td>
+                <td class="editable" contenteditable="true"></td>
+                <td class="editable" contenteditable="true"></td>
+                <td class="editable" contenteditable="true"></td>
+                <div class="item-controls no-print">
+                    <button class="btn-small" onclick="removeItem(this)">✕</button>
+                </div>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function removeItem(button) {
+            button.closest('.item-row').remove();
+        }
+
+        function exportToPDF() {
+            const element = document.getElementById('content');
+            const opt = {
+                margin: [15, 15, 15, 15],
+                filename: 'inventory-checklist.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function saveToLocalStorage() {
+            const content = document.getElementById('content').innerHTML;
+            localStorage.setItem('inventory-checklist', content);
+            alert('✅ Данные сохранены!');
+        }
+
+        function loadFromLocalStorage() {
+            const content = localStorage.getItem('inventory-checklist');
+            if (content) {
+                document.getElementById('content').innerHTML = content;
+                alert('✅ Данные загружены!');
+            } else {
+                alert('⚠️ Нет сохраненных данных');
+            }
+        }
+    </script>
+</body>
+</html>
