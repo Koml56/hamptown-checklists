@@ -387,9 +387,12 @@
             <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Главная</button>
             <button class="btn btn-success" onclick="addCategory()">+ Добавить Категорию</button>
             <button class="btn btn-primary" onclick="exportToPDF()">📄 Экспорт в PDF</button>
-            <button class="btn btn-secondary" onclick="saveToLocalStorage()">💾 Сохранить</button>
-            <button class="btn btn-secondary" onclick="loadFromLocalStorage()">📂 Загрузить</button>
+            <button class="btn btn-secondary" onclick="saveToFile()">💾 Сохранить в файл</button>
+            <button class="btn btn-secondary" onclick="loadFromFile()">📂 Загрузить из файла</button>
         </div>
+        <p style="font-size: 11px; color: #666; margin-top: 10px;">
+            ⚡ Автосохранение включено! Изменения сохраняются автоматически каждые 2 секунды.
+        </p>
     </div>
 
     <div id="content">
@@ -887,10 +890,66 @@
             }, 100);
         }
 
-        function saveToLocalStorage() {
+        // Автосохранение при любых изменениях
+        function autoSave() {
             const content = document.getElementById('content').innerHTML;
             localStorage.setItem('inventory-checklist', content);
-            alert('✅ Данные сохранены!');
+            localStorage.setItem('inventory-checklist-timestamp', new Date().toISOString());
+            console.log('✅ Автосохранение выполнено:', new Date().toLocaleTimeString());
+        }
+
+        // Сохранение в файл для переноса между устройствами
+        function saveToFile() {
+            const content = document.getElementById('content').innerHTML;
+            const data = {
+                version: '1.0',
+                type: 'inventory-checklist',
+                timestamp: new Date().toISOString(),
+                content: content
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventory-checklist-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('✅ Файл сохранен! Используйте его для переноса на другие устройства.');
+        }
+
+        // Загрузка из файла
+        function loadFromFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.type === 'inventory-checklist' && data.content) {
+                                document.getElementById('content').innerHTML = data.content;
+                                autoSave(); // Сохраняем локально
+                                alert('✅ Данные загружены из файла!');
+                            } else {
+                                alert('❌ Неверный формат файла');
+                            }
+                        } catch (error) {
+                            alert('❌ Ошибка чтения файла: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function saveToLocalStorage() {
+            autoSave();
+            alert('✅ Данные сохранены локально!');
         }
 
         function loadFromLocalStorage() {
@@ -902,6 +961,34 @@
                 alert('⚠️ Нет сохраненных данных');
             }
         }
+
+        // Автозагрузка при открытии страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedContent = localStorage.getItem('inventory-checklist');
+            if (savedContent) {
+                const timestamp = localStorage.getItem('inventory-checklist-timestamp');
+                const date = timestamp ? new Date(timestamp).toLocaleString('ru-RU') : 'неизвестно';
+                console.log('📂 Найдены сохраненные данные от:', date);
+
+                if (confirm(`Найдены сохраненные данные от ${date}. Загрузить?`)) {
+                    document.getElementById('content').innerHTML = savedContent;
+                }
+            }
+
+            // Автосохранение при изменении контента
+            const content = document.getElementById('content');
+            let saveTimeout;
+
+            content.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(autoSave, 2000); // Автосохранение через 2 секунды после последнего изменения
+            });
+
+            // Сохранение при закрытии страницы
+            window.addEventListener('beforeunload', () => {
+                autoSave();
+            });
+        });
     </script>
 </body>
 </html>
