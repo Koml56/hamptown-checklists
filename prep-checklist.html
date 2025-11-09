@@ -317,9 +317,11 @@
             <button class="btn btn-primary" onclick="exportToPDF()">📄 Экспорт в PDF</button>
             <button class="btn btn-secondary" onclick="saveToFile()">💾 Сохранить в файл</button>
             <button class="btn btn-secondary" onclick="loadFromFile()">📂 Загрузить из файла</button>
+            <button class="btn btn-success" id="github-sync-btn" onclick="toggleGitHubSync()">☁️ GitHub Sync: OFF</button>
         </div>
         <p style="font-size: 11px; color: #666; margin-top: 10px;">
             ⚡ Автосохранение включено! Изменения сохраняются автоматически каждые 2 секунды.
+            <span id="github-status" style="margin-left: 10px;"></span>
         </p>
     </div>
 
@@ -1030,6 +1032,239 @@
             window.addEventListener('beforeunload', () => {
                 autoSave();
             });
+
+            // Загрузка из GitHub при включенной синхронизации
+            if (isGitHubSyncEnabled()) {
+                loadFromGitHub();
+            }
+        });
+
+        // ===== GITHUB SYNC ФУНКЦИИ =====
+
+        const GITHUB_CONFIG = {
+            owner: 'Koml56',
+            repo: 'hamptown-checklists',
+            branch: 'data',
+            path: 'prep-checklist-data.json'
+        };
+
+        function isGitHubSyncEnabled() {
+            return localStorage.getItem('github-sync-enabled') === 'true';
+        }
+
+        function getGitHubToken() {
+            return localStorage.getItem('github-token');
+        }
+
+        function setGitHubToken(token) {
+            localStorage.setItem('github-token', token);
+        }
+
+        function toggleGitHubSync() {
+            if (isGitHubSyncEnabled()) {
+                // Выключить синхронизацию
+                localStorage.setItem('github-sync-enabled', 'false');
+                updateGitHubSyncButton(false);
+                updateGitHubStatus('Синхронизация отключена');
+            } else {
+                // Включить синхронизацию
+                const token = getGitHubToken();
+                if (!token) {
+                    showGitHubTokenDialog();
+                } else {
+                    enableGitHubSync();
+                }
+            }
+        }
+
+        function showGitHubTokenDialog() {
+            const instructions = `
+📝 Инструкция по настройке GitHub Sync:
+
+1. Откройте: https://github.com/settings/tokens/new
+2. Название: "Hamptown Checklists Sync"
+3. Срок действия: 90 дней (или больше)
+4. Выберите права (scopes):
+   ✅ repo (полный доступ к репозиториям)
+5. Нажмите "Generate token"
+6. Скопируйте токен (показывается один раз!)
+7. Вставьте ниже
+
+ВАЖНО: Токен будет сохранен локально в браузере.
+            `.trim();
+
+            alert(instructions);
+
+            const token = prompt('Вставьте ваш GitHub Personal Access Token:');
+            if (token && token.length > 20) {
+                setGitHubToken(token);
+                enableGitHubSync();
+            } else if (token) {
+                alert('❌ Неверный формат токена. Токен должен быть длиннее.');
+            }
+        }
+
+        function enableGitHubSync() {
+            localStorage.setItem('github-sync-enabled', 'true');
+            updateGitHubSyncButton(true);
+            updateGitHubStatus('Подключение к GitHub...');
+            loadFromGitHub();
+        }
+
+        function updateGitHubSyncButton(enabled) {
+            const btn = document.getElementById('github-sync-btn');
+            if (enabled) {
+                btn.textContent = '☁️ GitHub Sync: ON';
+                btn.className = 'btn btn-success';
+            } else {
+                btn.textContent = '☁️ GitHub Sync: OFF';
+                btn.className = 'btn btn-secondary';
+            }
+        }
+
+        function updateGitHubStatus(message, isError = false) {
+            const status = document.getElementById('github-status');
+            status.textContent = message;
+            status.style.color = isError ? '#dc3545' : '#28a745';
+        }
+
+        async function saveToGitHub() {
+            if (!isGitHubSyncEnabled()) return;
+
+            const token = getGitHubToken();
+            if (!token) return;
+
+            try {
+                const content = document.getElementById('content').innerHTML;
+                const data = {
+                    version: '1.0',
+                    type: 'prep-checklist',
+                    timestamp: new Date().toISOString(),
+                    content: content
+                };
+
+                const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+                // Получаем SHA файла если он существует
+                let sha = null;
+                try {
+                    const getResponse = await fetch(
+                        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        sha = fileData.sha;
+                    }
+                } catch (e) {
+                    console.log('Файл не существует, создаем новый');
+                }
+
+                // Сохраняем файл
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Auto-sync: ${new Date().toLocaleString('ru-RU')}`,
+                            content: encodedContent,
+                            branch: GITHUB_CONFIG.branch,
+                            sha: sha
+                        })
+                    }
+                );
+
+                if (response.ok) {
+                    updateGitHubStatus(`✅ Синхронизировано: ${new Date().toLocaleTimeString()}`);
+                    console.log('✅ GitHub sync успешно:', new Date().toLocaleTimeString());
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'GitHub API error');
+                }
+            } catch (error) {
+                console.error('❌ Ошибка синхронизации с GitHub:', error);
+                updateGitHubStatus(`❌ Ошибка: ${error.message}`, true);
+            }
+        }
+
+        async function loadFromGitHub() {
+            if (!isGitHubSyncEnabled()) return;
+
+            const token = getGitHubToken();
+            if (!token) return;
+
+            try {
+                updateGitHubStatus('📥 Загрузка с GitHub...');
+
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    const data = JSON.parse(decodedContent);
+
+                    if (data.type === 'prep-checklist' && data.content) {
+                        const localTimestamp = localStorage.getItem('prep-checklist-timestamp');
+                        const githubTimestamp = data.timestamp;
+
+                        // Сравниваем даты
+                        if (!localTimestamp || new Date(githubTimestamp) > new Date(localTimestamp)) {
+                            document.getElementById('content').innerHTML = data.content;
+                            localStorage.setItem('prep-checklist', data.content);
+                            localStorage.setItem('prep-checklist-timestamp', githubTimestamp);
+                            updateGitHubStatus(`✅ Загружено с GitHub: ${new Date(githubTimestamp).toLocaleString('ru-RU')}`);
+                        } else {
+                            updateGitHubStatus(`✅ Локальные данные актуальнее`);
+                        }
+                    }
+                } else if (response.status === 404) {
+                    updateGitHubStatus('ℹ️ Файл не найден в GitHub, будет создан при сохранении');
+                } else {
+                    throw new Error('Ошибка загрузки с GitHub');
+                }
+            } catch (error) {
+                console.error('❌ Ошибка загрузки с GitHub:', error);
+                updateGitHubStatus(`❌ Ошибка загрузки: ${error.message}`, true);
+            }
+        }
+
+        // Модифицируем autoSave для синхронизации с GitHub
+        const originalAutoSave = autoSave;
+        autoSave = function() {
+            originalAutoSave();
+            if (isGitHubSyncEnabled()) {
+                // Дебаунс для GitHub sync (раз в 10 секунд)
+                clearTimeout(window.githubSyncTimeout);
+                window.githubSyncTimeout = setTimeout(() => {
+                    saveToGitHub();
+                }, 10000);
+            }
+        };
+
+        // Обновляем кнопку при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            updateGitHubSyncButton(isGitHubSyncEnabled());
+            if (isGitHubSyncEnabled()) {
+                updateGitHubStatus('GitHub Sync включен');
+            }
         });
     </script>
 </body>
