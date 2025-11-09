@@ -392,7 +392,28 @@
         </div>
         <p style="font-size: 11px; color: #666; margin-top: 10px;">
             ⚡ Автосохранение включено! Изменения сохраняются автоматически каждые 2 секунды.
+            <br>
+            📱 <strong>Перенос на другое устройство:</strong> "💾 Сохранить в файл" → отправьте файл себе → перетащите файл на эту страницу или нажмите "📂 Загрузить из файла"
         </p>
+        <div id="drop-zone" style="
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(23,162,184,0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        ">
+            📂 Перетащите файл сюда для загрузки
+        </div>
     </div>
 
     <div id="content">
@@ -987,6 +1008,50 @@
             // Сохранение при закрытии страницы
             window.addEventListener('beforeunload', () => {
                 autoSave();
+            });
+
+            // ===== DRAG & DROP для загрузки файлов =====
+            const dropZone = document.getElementById('drop-zone');
+
+            // Показываем зону при перетаскивании файла
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.display = 'flex';
+            });
+
+            // Скрываем зону при выходе курсора
+            dropZone.addEventListener('dragleave', (e) => {
+                if (e.target === dropZone) {
+                    dropZone.style.display = 'none';
+                }
+            });
+
+            // Обработка загрузки файла
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.display = 'none';
+
+                const file = e.dataTransfer.files[0];
+                if (file && file.name.endsWith('.json')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.type === 'inventory-checklist' && data.content) {
+                                document.getElementById('content').innerHTML = data.content;
+                                autoSave();
+                                alert('✅ Данные загружены из файла!');
+                            } else {
+                                alert('❌ Неверный формат файла');
+                            }
+                        } catch (error) {
+                            alert('❌ Ошибка чтения файла: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('❌ Пожалуйста, используйте .json файл');
+                }
             });
         });
     </script>
