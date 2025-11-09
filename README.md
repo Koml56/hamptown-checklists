@@ -35,7 +35,7 @@
 
 ### Онлайн использование (рекомендуется)
 
-1. Откройте [GitHub Pages](https://yourusername.github.io/hamptown-checklists/) (после публикации)
+1. Откройте [GitHub Pages](https://koml56.github.io/hamptown-checklists/)
 2. Выберите нужный чек-лист
 3. Начните редактирование!
 
@@ -43,7 +43,7 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/yourusername/hamptown-checklists.git
+git clone https://github.com/Koml56/hamptown-checklists.git
 cd hamptown-checklists
 ```
 
