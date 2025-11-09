@@ -386,7 +386,7 @@
         <div class="button-group">
             <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Главная</button>
             <button class="btn btn-success" onclick="addCategory()">+ Добавить Категорию</button>
-            <button class="btn btn-primary" onclick="exportToPDF()">📄 Экспорт в PDF</button>
+            <button class="btn btn-primary" onclick="exportToHTML()">📄 Экспорт в HTML</button>
             <button class="btn btn-secondary" onclick="saveToFile()">💾 Сохранить в файл</button>
             <button class="btn btn-secondary" onclick="loadFromFile()">📂 Загрузить из файла</button>
         </div>
@@ -884,7 +884,6 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         function addCategory() {
             const categoryName = prompt('Введите название категории:');
@@ -955,53 +954,59 @@
             button.closest('.item-row').remove();
         }
 
-        function exportToPDF() {
-            const element = document.getElementById('content');
+        function exportToHTML() {
+            const content = document.getElementById('content').cloneNode(true);
 
-            // Скрываем все кнопки перед экспортом
-            const buttons = element.querySelectorAll('button');
-            const controls = element.querySelectorAll('.category-controls, .item-controls');
+            // Удаляем все кнопки управления из клона
+            content.querySelectorAll('.category-controls, .item-controls, button').forEach(el => el.remove());
 
-            buttons.forEach(btn => {
-                btn.style.display = 'none';
-                btn.style.visibility = 'hidden';
-            });
-            controls.forEach(ctrl => {
-                ctrl.style.display = 'none';
-                ctrl.style.visibility = 'hidden';
-            });
+            // Получаем стили из текущей страницы
+            const styles = Array.from(document.styleSheets)
+                .map(sheet => {
+                    try {
+                        return Array.from(sheet.cssRules)
+                            .map(rule => rule.cssText)
+                            .join('\n');
+                    } catch (e) {
+                        return '';
+                    }
+                })
+                .join('\n');
 
-            // Даем время на обновление DOM
-            setTimeout(() => {
-                const opt = {
-                    margin: [15, 15, 15, 15],
-                    filename: 'inventory-checklist.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: 'a4',
-                        orientation: 'portrait'
-                    },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
+            // Создаем полный HTML документ
+            const htmlContent = `<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varastotarkistuslista - ${new Date().toLocaleDateString('fi-FI')}</title>
+    <style>
+        ${styles}
+        /* Убираем интерактивные элементы */
+        .no-print, .category-controls, .item-controls, button {
+            display: none !important;
+        }
+        /* Убираем contenteditable атрибуты */
+        [contenteditable] {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    ${content.outerHTML}
+</body>
+</html>`;
 
-                html2pdf().set(opt).from(element).save().then(() => {
-                    // Показываем кнопки обратно после экспорта
-                    buttons.forEach(btn => {
-                        btn.style.display = '';
-                        btn.style.visibility = '';
-                    });
-                    controls.forEach(ctrl => {
-                        ctrl.style.display = '';
-                        ctrl.style.visibility = '';
-                    });
-                });
-            }, 100);
+            // Создаем Blob и скачиваем
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventory-checklist-${new Date().toISOString().split('T')[0]}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('✅ HTML файл сохранен! Откройте его в браузере для печати.');
         }
 
         // Автосохранение при любых изменениях
