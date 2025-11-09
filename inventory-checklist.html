@@ -840,6 +840,11 @@
 
         function exportToPDF() {
             const element = document.getElementById('content');
+
+            // Скрываем все кнопки перед экспортом
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(btn => btn.style.display = 'none');
+
             const opt = {
                 margin: [15, 15, 15, 15],
                 filename: 'inventory-checklist.pdf',
@@ -857,7 +862,10 @@
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Показываем кнопки обратно после экспорта
+                buttons.forEach(btn => btn.style.display = '');
+            });
         }
 
         function saveToLocalStorage() {
